@@ -42,12 +42,6 @@ export default class StuntFetcher extends EventEmitter {
     this.hardCodedServerHost = options.hardCodedServerHost ?? "66.226.72.227";
     this.hardCodedServerPort = options.hardCodedServerPort ?? 29960;
 
-    let clientConnected = false;
-
-    const isConnectionOpen = () => {
-      return this.ws.readyState === ws.OPEN && clientConnected;
-    };
-
     this.client.bind({
       exclusive: true,
     });
@@ -57,7 +51,7 @@ export default class StuntFetcher extends EventEmitter {
     });
 
     this.ws.on("open", () => {
-      if (isConnectionOpen()) this.emit("open");
+      this.emit("open");
     });
 
     this.ws.on("error", (err) => {
@@ -66,11 +60,6 @@ export default class StuntFetcher extends EventEmitter {
 
     this.client.on("error", (err) => {
       this.emit("error", err);
-    });
-
-    this.client.on("connect", () => {
-      clientConnected = true;
-      if (isConnectionOpen()) this.emit("open");
     });
   }
 
@@ -128,7 +117,7 @@ export default class StuntFetcher extends EventEmitter {
     return new Promise<Buffer>((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject("Timeout");
-      });
+      }, 10000);
 
       this.ws.send(Buffer.from(server.toString()));
 
@@ -146,7 +135,7 @@ export default class StuntFetcher extends EventEmitter {
     return new Promise<Buffer>((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject("Timeout");
-      });
+      }, 10000);
 
       this.client.send(Buffer.from("StuP\x00\x1C\x00"), this.hardCodedServerPort, this.hardCodedServerHost);
 
