@@ -1,10 +1,10 @@
-import StuntFetcher from ".";
+import StuntFetcher from "./index";
 
 async function main() {
   const sf = new StuntFetcher();
 
   sf.once("open", () => {
-    sf.getServers(false).then((servers) => {
+    sf.getServers(true).then((servers) => {
       console.log(servers);
     });
   });
