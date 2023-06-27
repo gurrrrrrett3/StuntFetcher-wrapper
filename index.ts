@@ -1,4 +1,5 @@
-import ws, { EventEmitter } from "ws";
+import { EventEmitter } from "node:events";
+import ws from "ws";
 import dgram, { Socket } from "dgram";
 
 export default class StuntFetcher extends EventEmitter {
@@ -18,7 +19,7 @@ export default class StuntFetcher extends EventEmitter {
    */
   constructor(
     port: number = 38019,
-    host: string = "localhost",
+    host: string = "127.0.0.1",
     options?: {
       debug?: boolean;
       masterServerHost?: string;
@@ -30,7 +31,7 @@ export default class StuntFetcher extends EventEmitter {
     if (!options) options = {};
 
     super();
-    this.ws = new ws(host ?? "localhost", { port: port ?? 38019 });
+    this.ws = new ws(`ws://${host ?? "localhost"}:${port}`);
     this.client = dgram.createSocket("udp4");
 
     this.debug = options.debug ?? false;
@@ -49,8 +50,6 @@ export default class StuntFetcher extends EventEmitter {
 
     this.client.bind({
       exclusive: true,
-      address: this.masterServerHost,
-      port: this.masterServerPort,
     });
 
     this.ws.on("message", (data) => {
